@@ -2821,6 +2821,37 @@ div.tocify {
 </div>
 <div id="task-2" class="section level2">
 <h2>Task 2</h2>
+<div id="line-a" class="section level3">
+<h3>Line A</h3>
+<p>Line A creates a random sample with replacement of size <span class="math inline">\(n*iter\)</span>, from the set <span class="math inline">\(x\)</span>. This means that there will be a long vector, with every <span class="math inline">\(n\)</span> elements in the vector representing one, of <span class="math inline">\(iter\)</span>, samples. Additionally, sampling with replacement ensures that each random outcome will be independent of all others.</p>
+</div>
+<div id="line-b" class="section level3">
+<h3>Line B</h3>
+<p>Line B calls the quantile function on <span class="math inline">\(xstat\)</span>, which is a vector of length <span class="math inline">\(iter\)</span>. It contains, by default, the mean value of each <span class="math inline">\(iter\)</span> random samples. By supplying quantile with a sequence of bounds created from <span class="math inline">\(\alpha\)</span>, we create a confidence interval that ensures that <span class="math inline">\(\mu\)</span> will have a <span class="math inline">\((1 - \alpha)*100 \%\)</span> chance of lying in the interval.</p>
+</div>
+<div id="sample" class="section level3">
+<h3>sample()</h3>
+<p>Sample must be called with replacement, otherwise the random sample collected of size <span class="math inline">\(n\)</span> would not be able to accomodate <span class="math inline">\(n*iter\)</span> unique values being drawn from it.</p>
+</div>
+<div id="commands" class="section level3">
+<h3>commands</h3>
+<pre class="r"><code>set.seed(35) 
+sam=round(rnorm(20,mean=10,sd=4),2)
+
+#five times
+for (i in 0:4)
+{
+unique(sample(sam,20,replace=TRUE))
+}
+
+#five times
+for (i in 0:4)
+{
+unique(sample(sam,20,replace=FALSE))
+}</code></pre>
+<p>In the first function call, sometimes the sample collected will be smaller than the requested sample size because repeats are thrown out. In the second function call, repeat values are accepted, so sometimes they are recorded twice in a single sample.</p>
+<p>The line <code>sample(sam,21,replace=FALSE)</code> cannot run because the sam is not large enough to collect a sample of 21 elements without replacement.</p>
+</div>
 </div>
 </div>
 

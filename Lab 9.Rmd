@@ -27,3 +27,39 @@ getwd()
 
 ## Task 2
 
+### Line A
+
+Line A creates a random sample with replacement of size $n*iter$, from the set $x$. This means that there will be a long vector, with every $n$ elements in the vector representing one, of $iter$, samples. Additionally, sampling with replacement ensures that each random outcome will be independent of all others.
+
+### Line B
+
+Line B calls the quantile function on $xstat$, which is a vector of length $iter$. It contains, by default, the mean value of each $iter$ random samples. By supplying quantile with a sequence of bounds created from $\alpha$, we create a confidence interval that ensures that $\mu$ will have a $(1 - \alpha)*100 \%$ chance of lying in the interval.
+
+### sample()
+
+Sample must be called with replacement, otherwise the random sample collected of size $n$ would not be able to accomodate $n*iter$ unique values being drawn from it.
+
+### commands
+
+```{r}
+set.seed(35) 
+sam=round(rnorm(20,mean=10,sd=4),2)
+
+#five times
+for (i in 0:4)
+{
+unique(sample(sam,20,replace=TRUE))
+}
+
+#five times
+for (i in 0:4)
+{
+unique(sample(sam,20,replace=FALSE))
+}
+```
+
+In the first function call, sometimes the sample collected will be smaller than the requested sample size because repeats are thrown out. In the second function call, repeat values are accepted, so sometimes they are recorded twice in a single sample.
+
+The line `sample(sam,21,replace=FALSE)` cannot run because the sam is not large enough to collect a sample of 21 elements without replacement.
+
+
