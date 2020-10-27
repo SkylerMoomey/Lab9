@@ -62,4 +62,104 @@ In the first function call, sometimes the sample collected will be smaller than 
 
 The line `sample(sam,21,replace=FALSE)` cannot run because the sam is not large enough to collect a sample of 21 elements without replacement.
 
+## Task 3
+
+### myboot(), 95% confidence interval, mean
+
+```{r}
+myboot<-function(iter=10000,x,fun="mean",alpha=0.05,...){  
+
+#Notice where the ... is repeated in the code
+n=length(x)   #sample size
+
+#Now sample with replacement
+y=sample(x,n*iter,replace=TRUE) #A
+
+# Make a matrix with all the resampled values
+rs.mat=matrix(y,nr=n,nc=iter,byrow=TRUE)
+xstat=apply(rs.mat,2,fun) 
+# xstat is a vector and will have iter values in it 
+ci=quantile(xstat,c(alpha/2,1-alpha/2)) #B
+# Nice way to form a confidence interval
+# A histogram follows
+# The object para will contain the parameters used to make the histogram
+para=hist(xstat,freq=FALSE,las=1,main="Histogram of Bootstrap sample statistics",...)
+
+#mat will be a matrix that contains the data, this is done so that I can use apply()
+mat=matrix(x,nr=length(x),nc=1,byrow=TRUE)
+
+#pte is the point estimate
+#This uses whatever fun is
+pte=apply(mat,2,fun)
+abline(v=pte,lwd=3,col="Black")# Vertical line
+segments(ci[1],0,ci[2],0,lwd=4)      #Make the segment for the ci
+text(ci[1],0,paste("(",round(ci[1],2),sep=""),col="Red",cex=3)
+text(ci[2],0,paste(round(ci[2],2),")",sep=""),col="Red",cex=3)
+
+# plot the point estimate 1/2 way up the density
+text(pte,max(para$density)/2,round(pte,2),cex=3)
+
+return(list(ci=ci,fun=fun,x=x))# Some output to use if necessary
+}
+```
+
+```{r}
+#random sample from normal, n=25, mu=25, sigma=10
+set.seed(39); sam1 = rnorm(25, 25, 10)
+myboot(x=sam1)
+
+#random sample from chisq, n=20, nu=3
+set.seed(30); sam2=rchisq(20, df=3)
+myboot(x=sam2)
+
+#random sample from gamma, n=30, alpha=2. beta=3
+set.seed(40); sam3=rgamma(30, shape=2, scale=3)
+myboot(x=sam3)
+
+#random sample from beta, n=20
+set.seed(10); sam4=rbeta(20, shape1=3, shape2=4)
+myboot(x=sam4)
+```
+### Normal
+
+For a normal distribution, the point estimate created by a random sample with $n=20$, has $\bar y=23.88$
+The true value of $\mu$ is 25.
+
+### Chi-Square
+
+For a Chi-Square, the point estimate created by a random sample with $n = 20$ has $\bar y = 2.94$.
+The true value of $\mu = \nu = 3$.
+
+### Gamma
+
+For a Gamma distribution, the point estimate created by a random sample with $n=30$ has $\bar y = 6.5$.
+The true vale of $\mu = \alpha \beta = 2*3 = 6$
+
+### Beta
+
+For a Beta distribution, the point estimate created by a random sample with $n=20$ has $\bar y=0.41$.
+The true value of $\mu = \frac{\alpha}{\alpha + \beta} = \frac{3}{3+4} = \frac{3}{7} \approx 0.4286$.
+
+### Conclusion
+
+In each case, the true value $\mu$ is within the 95% confidence interval.
+
+### myboot(), 80% confidence interval, variance
+
+```{r}
+set.seed(39); sam1 = rnorm(25, 25, 10)
+myboot(x=sam1, fun="var")
+
+#random sample from chisq, n=20, nu=3
+set.seed(30); sam2=rchisq(20, df=3)
+myboot(x=sam2, fun="var")
+
+#random sample from gamma, n=30, alpha=2. beta=3
+set.seed(40); sam3=rgamma(30, shape=2, scale=3)
+myboot(x=sam3, fun="var")
+
+#random sample from beta, n=20
+set.seed(10); sam4=rbeta(20, shape1=3, shape2=4)
+myboot(x=sam4, fun="var")
+```
 
