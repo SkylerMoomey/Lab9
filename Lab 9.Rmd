@@ -163,3 +163,159 @@ set.seed(10); sam4=rbeta(20, shape1=3, shape2=4)
 myboot(x=sam4, fun="var")
 ```
 
+## Task 4
+
+### Adjusted myboot()
+
+```{r}
+myboot<-function(iter=10000,x,fun="mean",alpha=0.05,...){  
+
+#Notice where the ... is repeated in the code
+n=length(x)   #sample size
+
+#Now sample with replacement
+y=sample(x,n*iter,replace=TRUE) #A
+
+# Make a matrix with all the resampled values
+rs.mat=matrix(y,nr=n,nc=iter,byrow=TRUE)
+xstat=apply(rs.mat,2,fun) 
+# xstat is a vector and will have iter values in it 
+ci=quantile(xstat,c(alpha/2,1-alpha/2)) #B
+# Nice way to form a confidence interval
+# A histogram follows
+# The object para will contain the parameters used to make the histogram
+para=hist(xstat,freq=FALSE,las=1,main="Histogram of Bootstrap sample statistics",...)
+
+#mat will be a matrix that contains the data, this is done so that I can use apply()
+mat=matrix(x,nr=length(x),nc=1,byrow=TRUE)
+
+#pte is the point estimate
+#This uses whatever fun is
+pte=apply(mat,2,fun)
+abline(v=pte,lwd=3,col="Black")# Vertical line
+segments(ci[1],0,ci[2],0,lwd=4)      #Make the segment for the ci
+text(ci[1],0,paste("(",round(ci[1],2),sep=""),col="Red",cex=3)
+text(ci[2],0,paste(round(ci[2],2),")",sep=""),col="Red",cex=3)
+
+# plot the point estimate 1/2 way up the density
+text(pte,max(para$density)/2,round(pte,2),cex=3)
+
+return(list(xstat, ci=ci,fun=fun,x=x))# Some output to use if necessary
+}
+```
+
+
+### sam=c(1,1,1,2,2,2,2,3,3,3,4,4)
+
+```{r}
+sam=c(1,1,1,2,2,2,2,3,3,3,4,4)
+
+bootstrapstat=myboot(x=sam, fun="median")
+
+```
+
+The bootstrap interval estimate is $(1.5, 3)$.
+
+## Task 5
+
+### 95% confidence
+
+```{r}
+##function to calculate mean/median, pass to myboot
+mean_over_median = function(x)
+{
+  return (mean(x)/median(x))
+}
+
+set.seed(39); sam=rnorm(25,mean=25,sd=10)
+bootstat = myboot(x=sam, fun=mean_over_median)
+
+set.seed(30); sam=rchisq(20,df=3)
+bootstat = myboot(x=sam, fun=mean_over_median)
+
+set.seed(40); sam=rgamma(30,shape=2,scale=3)
+bootstat = myboot(x=sam, fun=mean_over_median)
+
+set.seed(10); sam=rbeta(20,shape1=3,shape2=4)
+bootstat = myboot(x=sam, fun=mean_over_median)
+
+```
+
+### 70% confidence
+
+```{r}
+set.seed(39); sam=rnorm(25,mean=25,sd=10)
+bootstat = myboot(x=sam, fun=mean_over_median, alpha=.3)
+
+set.seed(30); sam=rchisq(20,df=3)
+bootstat = myboot(x=sam, fun=mean_over_median, alpha=.3)
+
+set.seed(40); sam=rgamma(30,shape=2,scale=3)
+bootstat = myboot(x=sam, fun=mean_over_median, alpha=.3)
+
+set.seed(10); sam=rbeta(20,shape1=3,shape2=4)
+bootstat = myboot(x=sam, fun=mean_over_median, alpha=.3)
+```
+
+## Task 6
+
+### Uniform Distribution
+```{r}
+set.seed(1); sam=runif(20, min=0, max = 10)
+bootstat=myboot(x=sam, fun="mean", alpha=.2)
+bootstat=myboot(x=sam, fun="var", alpha=.2)
+```
+
+### F distribution
+
+```{r}
+set.seed(2); sam=rf(20, df1=5, df2=3)
+bootstat=myboot(x=sam, fun="mean", alpha=.2)
+bootstat=myboot(x=sam, fun="var", alpha=.2)
+```
+
+### Weibull Distribution
+
+```{r}
+set.seed(3); sam=rweibull(20, shape = 2, scale = 4)
+bootstat=myboot(x=sam, fun="mean", alpha=.2)
+bootstat=myboot(x=sam, fun="var", alpha=.2)
+```
+
+### Binomial Distribution
+
+```{r}
+set.seed(4); sam=rbinom(20, size = 100, p=.6)
+bootstat=myboot(x=sam, fun="mean", alpha=.2)
+bootstat=myboot(x=sam, fun="var", alpha=.2)
+```
+
+## Task 7
+
+### Bootstrap of Normal for SD and IQR
+```{r}
+set.seed(68); sam=rnorm(20, mean=10, sd=4)
+
+bootstat=myboot(x=sam, fun="sd")
+bootstat=myboot(x=sam, fun="IQR")
+```
+
+### Theoretical calculation for mean, 95% confidence interval
+
+```{r}
+alpha=0.05
+z_alpha_2 = qnorm(1-(alpha/2), mean=0, sd=1)
+z_alpha_2
+
+mean(sam)
+```
+
+We have found that $z_\frac{\alpha}{2} = 1.959964$ for $\alpha = 0.05$. The mean of our sample was $10.45931$, thus our $95\%$ confidence interval is approximately $(8.499346, 12.419)$.
+
+### Verification
+
+```{r}
+bootstate=myboot(x=sam)
+```
+
+The $95\%$ confidence interval given from the bootstrap function was $(8.93, 11.89)$, which varies from the true value by $(+0.43, -0.529)$.
