@@ -319,3 +319,14 @@ bootstate=myboot(x=sam)
 ```
 
 The $95\%$ confidence interval given from the bootstrap function was $(8.93, 11.89)$, which varies from the true value by $(+0.43, -0.529)$.
+
+## Task 8
+
+### myboot2 on package data
+
+```{r}
+library(MATH4753moom0002)
+
+ciobj=MATH4753moom0002::myboot2(x=fire$DISTANCE)
+```
+
